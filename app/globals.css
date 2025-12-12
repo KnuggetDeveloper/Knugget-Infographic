@@ -1,0 +1,114 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --animate-aurora: aurora 20s linear infinite;
+  @keyframes aurora {
+    0% {
+      background-position: 50% 50%, 50% 50%;
+    }
+    100% {
+      background-position: 350% 50%, 350% 50%;
+    }
+  }
+}
+
+:root {
+  /* Dark Mode Default */
+  --background: 240 10% 4%; /* Deepest Charcoal/Black */
+  --foreground: 0 0% 98%;
+
+  --primary: 250 100% 70%; /* Electric Purple/Blue */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 240 4% 16%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 240 4% 16%;
+  --muted-foreground: 240 5% 65%;
+
+  --accent: 250 100% 70%;
+  --accent-foreground: 0 0% 100%;
+
+  --border: 240 4% 16%;
+  --input: 240 4% 16%;
+  --ring: 250 100% 70%;
+
+  --radius: 0.5rem;
+}
+
+body {
+  @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display tracking-tight;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10;
+}
+
+.glass-card {
+  @apply bg-black/40 backdrop-blur-md border border-white/5 hover:border-white/10 transition-colors duration-300;
+}
+
+.aurora-bg {
+  background-image: 
+    radial-gradient(at 100% 100%, hsla(253, 100%, 70%, 0.15) 0, transparent 50%), 
+    radial-gradient(at 0% 0%, hsla(220, 90%, 60%, 0.15) 0, transparent 50%),
+    radial-gradient(at 50% 50%, hsla(280, 100%, 70%, 0.1) 0, transparent 50%);
+  filter: blur(60px);
+}
+
+.vibrant-glow-bg {
+    background: 
+      radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.4) 0%, transparent 60%),
+      radial-gradient(circle at 100% 0%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(168, 85, 247, 0.4) 0%, transparent 50%);
+    opacity: 0.8;
+    filter: blur(80px);
+}
