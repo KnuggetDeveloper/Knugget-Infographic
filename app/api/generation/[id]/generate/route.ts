@@ -3,25 +3,42 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    // Check authentication
     const session = await auth();
 
     if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    // Verify the generation exists and belongs to the user
+    const generation = await prisma.generation.findUnique({
+      where: { id },
+    });
+
+    if (!generation) {
       return NextResponse.json(
-        { error: "Unauthorized. Please sign in to generate infographics." },
-        { status: 401 }
+        { error: "Generation not found" },
+        { status: 404 }
       );
     }
 
-    const { prompt } = await request.json();
+    if (generation.userId !== session.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
 
-    if (!prompt) {
-      return NextResponse.json(
-        { error: "Prompt is required" },
-        { status: 400 }
-      );
+    // Check if already generated
+    if (generation.imageData && generation.imageData !== "") {
+      return NextResponse.json({
+        success: true,
+        imageData: generation.imageData,
+        cached: true,
+      });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -41,8 +58,7 @@ export async function POST(request: NextRequest) {
 - Use a modern, clean design style
 - Ensure all text is legible and well-placed`;
 
-    // Combine system prompt with user prompt
-    const fullPrompt = `${systemPrompt}\n\nUser Request: ${prompt}\n\nGenerate a high-quality infographic based on the above request.`;
+    const fullPrompt = `${systemPrompt}\n\nUser Request: ${generation.prompt}\n\nGenerate a high-quality infographic based on the above request.`;
 
     const ai = new GoogleGenAI({ apiKey });
 
@@ -69,19 +85,15 @@ export async function POST(request: NextRequest) {
         if (part.inlineData && part.inlineData.data) {
           const imageData = part.inlineData.data;
 
-          // Save generation to database
-          const generation = await prisma.generation.create({
-            data: {
-              prompt,
-              imageData,
-              userId: session.user.id,
-            },
+          // Update generation with image data
+          await prisma.generation.update({
+            where: { id },
+            data: { imageData },
           });
 
           return NextResponse.json({
             success: true,
             imageData: imageData,
-            generationId: generation.id,
           });
         }
       }
@@ -101,3 +113,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-page-custom-font */
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Infograph.ai - Generate Stunning Infographics",
@@ -21,7 +22,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" href="/favicon.png" />
       </head>
       <body className="antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
